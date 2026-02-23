@@ -1,33 +1,182 @@
+// ===========================
+// RECIPE DATA
+// ===========================
+
 const recipes = [
-  { id: 1, title: "Pasta", time: 25, difficulty: "easy", description: "Creamy pasta.", category: "pasta" },
-  { id: 2, title: "Pizza", time: 60, difficulty: "medium", description: "Cheese pizza.", category: "pizza" },
-  { id: 3, title: "Salad", time: 15, difficulty: "easy", description: "Healthy salad.", category: "salad" },
-  { id: 4, title: "Butter Chicken", time: 75, difficulty: "hard", description: "Indian curry.", category: "curry" },
-  { id: 5, title: "Noodles", time: 30, difficulty: "medium", description: "Tasty noodles.", category: "asian" },
-  { id: 6, title: "Cake", time: 45, difficulty: "medium", description: "Chocolate cake.", category: "dessert" },
-  { id: 7, title: "Biryani", time: 90, difficulty: "hard", description: "Spicy rice.", category: "indian" },
-  { id: 8, title: "Sandwich", time: 10, difficulty: "easy", description: "Quick snack.", category: "snack" }
+    { title: "Spaghetti Carbonara", difficulty: "medium", time: 25 },
+    { title: "Grilled Cheese Sandwich", difficulty: "easy", time: 10 },
+    { title: "Beef Wellington", difficulty: "hard", time: 90 },
+    { title: "Chicken Curry", difficulty: "medium", time: 40 },
+    { title: "Pancakes", difficulty: "easy", time: 20 },
+    { title: "Caesar Salad", difficulty: "easy", time: 15 },
+    { title: "Chocolate Souffle", difficulty: "hard", time: 60 },
+    { title: "Vegetable Stir Fry", difficulty: "medium", time: 18 }
 ];
 
-const container = document.querySelector("#recipe-container");
+// ===========================
+// STATE MANAGEMENT
+// ===========================
 
-const createCard = (recipe) => {
-  return `
-    <div class="recipe-card">
-      <h3>${recipe.title}</h3>
-      <div class="recipe-meta">
-        <span>${recipe.time} min</span>
-        <span class="difficulty ${recipe.difficulty}">
-          ${recipe.difficulty}
-        </span>
-      </div>
-      <p>${recipe.description}</p>
-    </div>
-  `;
+let currentFilter = "all";
+let currentSort = "none";
+
+// ===========================
+// DOM REFERENCES
+// ===========================
+
+const recipeContainer = document.getElementById("recipe-container");
+const filterButtons = document.querySelectorAll("[data-filter]");
+const sortButtons = document.querySelectorAll("[data-sort]");
+
+// ===========================
+// PURE FILTER FUNCTIONS
+// ===========================
+
+const filterByDifficulty = (recipes, difficulty) => {
+    return recipes.filter(recipe => recipe.difficulty === difficulty);
 };
+
+const filterByTime = (recipes, maxTime) => {
+    return recipes.filter(recipe => recipe.time < maxTime);
+};
+
+const applyFilter = (recipes, filterType) => {
+    switch (filterType) {
+        case "easy":
+        case "medium":
+        case "hard":
+            return filterByDifficulty(recipes, filterType);
+        case "quick":
+            return filterByTime(recipes, 30);
+        case "all":
+        default:
+            return recipes;
+    }
+};
+
+// ===========================
+// PURE SORT FUNCTIONS
+// ===========================
+
+const sortByName = (recipes) => {
+    return [...recipes].sort((a, b) =>
+        a.title.localeCompare(b.title)
+    );
+};
+
+const sortByTime = (recipes) => {
+    return [...recipes].sort((a, b) =>
+        a.time - b.time
+    );
+};
+
+const applySort = (recipes, sortType) => {
+    switch (sortType) {
+        case "name":
+            return sortByName(recipes);
+        case "time":
+            return sortByTime(recipes);
+        case "none":
+        default:
+            return recipes;
+    }
+};
+
+// ===========================
+// RENDER FUNCTION
+// ===========================
 
 const renderRecipes = (recipes) => {
-  container.innerHTML = recipes.map(createCard).join("");
+    recipeContainer.innerHTML = "";
+
+    recipes.forEach(recipe => {
+        const card = document.createElement("div");
+        card.classList.add("recipe-card");
+
+        card.innerHTML = `
+            <h3>${recipe.title}</h3>
+            <p><strong>Difficulty:</strong> ${recipe.difficulty}</p>
+            <p><strong>Time:</strong> ${recipe.time} mins</p>
+        `;
+
+        recipeContainer.appendChild(card);
+    });
 };
 
-renderRecipes(recipes);
+// ===========================
+// UPDATE DISPLAY (MAIN FLOW)
+// ===========================
+
+const updateDisplay = () => {
+    let result = recipes;
+
+    result = applyFilter(result, currentFilter);
+    result = applySort(result, currentSort);
+
+    renderRecipes(result);
+
+    updateActiveButtons();
+
+    console.log(
+        `Displaying ${result.length} recipes (Filter: ${currentFilter}, Sort: ${currentSort})`
+    );
+};
+
+// ===========================
+// ACTIVE BUTTON MANAGEMENT
+// ===========================
+
+const updateActiveButtons = () => {
+
+    filterButtons.forEach(btn => {
+        btn.classList.remove("active");
+        if (btn.dataset.filter === currentFilter) {
+            btn.classList.add("active");
+        }
+    });
+
+    sortButtons.forEach(btn => {
+        btn.classList.remove("active");
+        if (btn.dataset.sort === currentSort) {
+            btn.classList.add("active");
+        }
+    });
+};
+
+// ===========================
+// EVENT HANDLERS
+// ===========================
+
+const handleFilterClick = (event) => {
+    currentFilter = event.target.dataset.filter;
+    updateDisplay();
+};
+
+const handleSortClick = (event) => {
+    currentSort = event.target.dataset.sort;
+    updateDisplay();
+};
+
+// ===========================
+// EVENT LISTENERS
+// ===========================
+
+const setupEventListeners = () => {
+
+    filterButtons.forEach(button => {
+        button.addEventListener("click", handleFilterClick);
+    });
+
+    sortButtons.forEach(button => {
+        button.addEventListener("click", handleSortClick);
+    });
+};
+
+// ===========================
+// INITIALIZATION
+// ===========================
+
+document.addEventListener("DOMContentLoaded", () => {
+    setupEventListeners();
+    updateDisplay();
+});
