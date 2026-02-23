@@ -1,24 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RecipeJS</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <title>RecipeJS App</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-  <h1>🍳 RecipeJS</h1>
-  <p>Your Functional Cooking Companion</p>
-</header>
+    <h1>🍳 RecipeJS - Functional Cooking Companion</h1>
 
-<main>
-  <div id="recipe-container">
-    <!-- JS will add cards here -->
-  </div>
-</main>
+    <!-- Filter Buttons -->
+    <div class="controls">
+        <button class="filter-btn" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="easy">Easy</button>
+        <button class="filter-btn" data-filter="medium">Medium</button>
+        <button class="filter-btn" data-filter="hard">Hard</button>
+    </div>
 
-<script src="app.js"></script>
+    <!-- Sort Buttons -->
+    <div class="controls">
+        <button class="sort-btn" data-sort="name">Sort by Name</button>
+        <button class="sort-btn" data-sort="time">Sort by Time</button>
+    </div>
+
+    <div id="recipe-container"></div>
+
+    <script src="app.js"></script>
 </body>
 </html>
